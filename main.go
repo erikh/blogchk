@@ -43,13 +43,18 @@ func main() {
 }
 
 func lint(ctx *cli.Context) error {
-	if len(ctx.Args()) != 1 {
-		return errors.New("filename required (pass /dev/stdin if you want to pipe)")
-	}
+	f := os.Stdin
 
-	f, err := os.Open(ctx.Args()[0])
-	if err != nil {
-		return fmt.Errorf("trouble opening file: %w", err)
+	if len(ctx.Args()) == 0 {
+		fmt.Fprintln(os.Stderr, "reading from stdin")
+	} else if len(ctx.Args()) != 1 {
+		return errors.New("filename required (pass /dev/stdin if you want to pipe)")
+	} else {
+		var err error
+		f, err = os.Open(ctx.Args()[0])
+		if err != nil {
+			return fmt.Errorf("trouble opening file: %w", err)
+		}
 	}
 
 	var line int
